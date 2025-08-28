@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Threat Analysis System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .threat-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+    }
+    .threat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .risk-indicator {
+      height: 20px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .risk-low { background-color: #28a745; }
+    .risk-medium { background-color: #ffc107; }
+    .risk-high { background-color: #dc3545; }
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .loading-spinner.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .card h5 {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="text-center mb-5">Advanced Threat Analysis System</h1>
+
+    <!-- Analysis Panel -->
+    <div class="row mb-4 justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Threat Analysis Panel</h4>
+          </div>
+          <div class="card-body">
+            <form id="analysisForm" enctype="multipart/form-data" role="form" aria-label="Threat analysis form">
+              <div class="mb-3">
+                <label for="networkData" class="form-label">Network Traffic Features</label>
+                <textarea id="networkData" class="form-control" rows="3" placeholder="Enter comma-separated network features"></textarea>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="loadSampleNetwork">Load Sample Data</button>
+              </div>
+              <div class="mb-3">
+                <label for="malwareFile" class="form-label">Malware Sample</label>
+                <input type="file" class="form-control" id="malwareFile" accept=".exe,.bin,.dll" />
+                <div id="malwareFileName" class="form-text text-muted mt-1"></div>
+              </div>
+              <div class="mb-3">
+                <label for="vulnText" class="form-label">Vulnerability Description</label>
+                <textarea id="vulnText" class="form-control" rows="3" placeholder="Enter vulnerability description"></textarea>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="loadSampleVuln">Load Sample Data</button>
+              </div>
+              <div class="mb-3">
+                <label for="jsonFile" class="form-label">Upload JSON Dataset</label>
+                <input type="file" class="form-control" id="jsonFile" accept=".json" />
+                <div id="jsonFileName" class="form-text text-muted mt-1"></div>
+              </div>
+              <div class="mb-3">
+                <label for="pcapFile" class="form-label">Upload PCAP_ISCX Dataset</label>
+                <input type="file" class="form-control" id="pcapFile" accept=".pcap_ISCX,.pcap_iscx,.PCAP_ISCX" />
+                <div id="pcapFileName" class="form-text text-muted mt-1"></div>
+              </div>
+              <div class="mb-3">
+                <label for="parquetFile" class="form-label">Upload Parquet Dataset</label>
+                <input type="file" class="form-control" id="parquetFile" accept=".parquet" />
+                <div id="parquetFileName" class="form-text text-muted mt-1"></div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 mt-2">Analyze Threat</button>
+
+              <div class="loading-spinner mt-4" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                <p class="mt-3">Analyzing...</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    < class="row g-4" id="resultsContainer" style="display: none;">
+      <!-- Dynamic Threat Cards -->
+      <div class="col-md-4" id="intrusionCard"></div>
+      <div class="col-md-4" id="malwareCard"></div>
+      <div class="col-md-4" id="vulnCard"></div>
+
+      <!-- Combined Risk -->
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Combined Threat Assessment</h5>
+          </div>
+          <div class="card-body">
+            <h4>Overall Risk Score: <span id="overallRisk">-</span></h4>
+            <span class="badge" id="overallRiskLevel">-</span>
+            <div class="risk-indicator my-2" id="riskIndicator"></div>
+            <div class="mt-3">
+              <h5>Recommendations</h5>
+              <ul class="list-group" id="recommendations"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
+
+  <script>
+    let intrusionChart, malwareChart, vulnChart;
+
+    function setBadgeClass(element, level) {
+      element.className = 'badge ';
+      switch (level.toLowerCase()) {
+        case 'low': element.classList.add('bg-success'); break;
+        case 'medium': element.classList.add('bg-warning', 'text-dark'); break;
+        case 'high': element.classList.add('bg-danger'); break;
+        default: element.classList.add('bg-secondary');
+      }
+    }
+
+    function updateRiskIndicator(score) {
+      const indicator = document.getElementById('riskIndicator');
+      indicator.className = 'risk-indicator';
+      if (score < 3.3) indicator.classList.add('risk-low');
+      else if (score < 6.6) indicator.classList.add('risk-medium');
+      else indicator.classList.add('risk-high');
+    }
+
+    // Utility to show selected file name
+    function setupFileNameDisplay(inputId, displayId) {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      input.addEventListener('change', () => {
+        display.textContent = input.files.length ? `Selected: ${input.files[0].name}` : '';
+      });
+    }
+
+    ['malwareFile', 'jsonFile', 'pcapFile', 'parquetFile'].forEach(id => {
+      setupFileNameDisplay(id, `${id}Name`);
+    });
+
+    // Load sample buttons
+    document.getElementById('loadSampleNetwork').onclick = () => {
+      document.getElementById('networkData').value = 'SrcIP, DestIP, SrcPort, DestPort, Protocol, PacketCount, ByteCount, Duration';
+    };
+    document.getElementById('loadSampleVuln').onclick = () => {
+      document.getElementById('vulnText').value = 'Buffer overflow vulnerability in XYZ protocol stack allows remote code execution.';
+    };
+
+    // Form submission
+    document.getElementById('analysisForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.classList.add('active');
+
+      // Simulated delay
+      setTimeout(() => {
+        const result = generateDummyResults();
+        displayResults(result);
+        spinner.classList.remove('active');
+      }, 1500);
+    });
+
+    function updateChart(chartInstance, canvasId, chartData, label) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      if (chartInstance) {
+        chartInstance.data = chartData;
+        chartInstance.update();
+      } else {
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: chartData,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: { display: true, text: label }
+            },
+            scales: {
+              y: { beginAtZero: true, max: 1 }
+            }
+          }
+        });
+      }
+
+      if (canvasId === 'intrusionChart') intrusionChart = chartInstance;
+      else if (canvasId === 'malwareChart') malwareChart = chartInstance;
+      else if (canvasId === 'vulnChart') vulnChart = chartInstance;
+    }
+
+    function displayResults(data) {
+      const container = document.getElementById('resultsContainer');
+      container.style.display = 'flex';
+
+      const cards = [
+        {
+          id: 'intrusion',
+          title: 'Intrusion Detection',
+          bg: 'bg-info',
+          data: data.intrusion,
+          chart: 'intrusionChart'
+        },
+        {
+          id: 'malware',
+          title: 'Malware Analysis',
+          bg: 'bg-warning text-dark',
+          data: data.malware,
+          chart: 'malwareChart'
+        },
+        {
+          id: 'vuln',
+          title: 'Vulnerability Assessment',
+          bg: 'bg-danger text-white',
+          data: data.vulnerability,
+          chart: 'vulnChart'
+        }
+      ];
+
+      cards.forEach(({ id, title, bg, data, chart }) => {
+        document.getElementById(`${id}Card`).innerHTML = `
+          <div class="card threat-card shadow mb-4">
+            <div class="card-header ${bg}"><h5 class="mb-0">${title}</h5></div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2"><span>${id === 'vuln' ? 'CVSS Score' : 'Probability'}:</span><strong>${(data.probability ?? data.cvssScore).toFixed(2)}</strong></div>
+              <div class="d-flex justify-content-between mb-2"><span>${id === 'vuln' ? 'Severity' : 'Status'}:</span><span class="badge" id="${id}Status">${data.status ?? data.severity}</span></div>
+              <canvas id="${chart}" height="150"></canvas>
+            </div>
+          </div>`;
+        setBadgeClass(document.getElementById(`${id}Status`), data.status ?? data.severity);
+        updateChart(window[`${id}Chart`], chart, data.chartData, title);
+      });
+
+      document.getElementById('overallRisk').textContent = data.overallRisk.score.toFixed(2);
+      document.getElementById('overallRiskLevel').textContent = data.overallRisk.level;
+      setBadgeClass(document.getElementById('overallRiskLevel'), data.overallRisk.level);
+      updateRiskIndicator(data.overallRisk.score);
+
+      const recList = document.getElementById('recommendations');
+      recList.innerHTML = '';
+      data.recommendations.forEach(r => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = r;
+        recList.appendChild(li);
+      });
+    }
+
+    function generateDummyResults() {
+      return {
+        intrusion: {
+          probability: 0.78,
+          status: 'High',
+          chartData: {
+            labels: ['Normal', 'Intrusion'],
+            datasets: [{
+              label: 'Probability',
+              data: [0.22, 0.78],
+              backgroundColor: ['#28a745', '#dc3545']
+            }]
+          }
+        },
+        malware: {
+          probability: 0.34,
+          status: 'Medium',
+          chartData: {
+            labels: ['Benign', 'Malware'],
+            datasets: [{
+              label: 'Probability',
+              data: [0.66, 0.34],
+              backgroundColor: ['#28a745', '#ffc107']
+            }]
+          }
+        },
+        vulnerability: {
+          cvssScore: 7.8,
+          severity: 'High',
+          chartData: {
+            labels: ['Low', 'Medium', 'High'],
+            datasets: [{
+              label: 'CVSS Scores',
+              data: [2, 4, 7.8],
+              backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+            }]
+          }
+        },
+        overallRisk: { score: 7.1, level: 'High' },
+        recommendations: [
+          'Isolate affected systems.',
+          'Apply security patches.',
+          'Monitor traffic for anomalies.',
+          'Conduct forensic analysis.'
+        ]
+      };
+    }
+    
+  </script>
+</body>
+</html>

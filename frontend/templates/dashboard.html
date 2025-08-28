@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Defense Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="navbar">
+            <div class="logo">Advanced Threat Analysis</div>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/network">Network</a>
+                <a href="/malware">Malware</a>
+                <a href="/vulnerabilities">Vulnerabilities</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Threat Overview</h2>
+                <span class="threat-level threat-high">High Alert</span>
+            </div>
+            <div class="chart-container" id="threatTrendChart"></div>
+        </div>
+
+        <div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Network Threats</h3>
+                    <span class="threat-level threat-medium">12 Detected</span>
+                </div>
+                <div class="chart-container" id="networkThreatsChart"></div>
+                <a href="/network" class="btn btn-secondary" style="margin-top: 1rem;">View Details</a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Malware Analysis</h3>
+                    <span class="threat-level threat-high">8 Detected</span>
+                </div>
+                <div class="chart-container" id="malwareChart"></div>
+                <a href="/malware" class="btn btn-secondary" style="margin-top: 1rem;">View Details</a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Vulnerabilities</h3>
+                    <span class="threat-level threat-low">3 Critical</span>
+                </div>
+                <div class="chart-container" id="vulnerabilitiesChart"></div>
+                <a href="/vulnerabilities" class="btn btn-secondary" style="margin-top: 1rem;">View Details</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Threats</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Source</th>
+                            <th>Severity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2023-11-15 14:32:45</td>
+                            <td>DDoS Attack</td>
+                            <td>192.168.1.45</td>
+                            <td><span class="threat-level threat-high">High</span></td>
+                            <td><a href="/threat/1" class="btn">Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>2023-11-15 13:18:22</td>
+                            <td>Malware</td>
+                            <td>File: invoice.exe</td>
+                            <td><span class="threat-level threat-high">High</span></td>
+                            <td><a href="/threat/2" class="btn">Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>2023-11-15 11:05:33</td>
+                            <td>Brute Force</td>
+                            <td>45.67.89.123</td>
+                            <td><span class="threat-level threat-medium">Medium</span></td>
+                            <td><a href="/threat/3" class="btn">Details</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2023 Advanced Threat Analysis System
+    </div>
+
+    <script>
+        // Threat trend chart
+        const threatTrendData = {
+            x: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            y: [12, 19, 15, 27, 35, 28, 17],
+            type: 'line',
+            name: 'Threats Detected'
+        };
+        Plotly.newPlot('threatTrendChart', [threatTrendData], {
+            margin: {t: 0},
+            yaxis: {title: 'Number of Threats'}
+        });
+
+        // Network threats chart
+        const networkData = {
+            values: [35, 45, 20],
+            labels: ['DDoS', 'Brute Force', 'Port Scan'],
+            type: 'pie'
+        };
+        Plotly.newPlot('networkThreatsChart', [networkData], {
+            margin: {t: 0, b: 0, l: 0, r: 0}
+        });
+
+        // Malware chart
+        const malwareData = {
+            x: ['Trojan', 'Ransomware', 'Spyware', 'Worm'],
+            y: [12, 8, 5, 3],
+            type: 'bar'
+        };
+        Plotly.newPlot('malwareChart', [malwareData], {
+            margin: {t: 0}
+        });
+
+        // Vulnerabilities chart
+        const vulnData = {
+            x: ['Critical', 'High', 'Medium', 'Low'],
+            y: [3, 7, 12, 5],
+            type: 'bar',
+            marker: {
+                color: ['#c62828', '#f57f17', '#ffeb3b', '#2e7d32']
+            }
+        };
+        Plotly.newPlot('vulnerabilitiesChart', [vulnData], {
+            margin: {t: 0}
+        });
+    </script>
+</body>
+</html>

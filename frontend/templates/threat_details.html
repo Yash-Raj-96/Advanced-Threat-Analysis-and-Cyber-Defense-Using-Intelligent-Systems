@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Details | Cyber Defense</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="navbar">
+            <div class="logo">Advanced Threat Analysis</div>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/network">Network</a>
+                <a href="/malware">Malware</a>
+                <a href="/vulnerabilities">Vulnerabilities</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Threat Details: DDoS Attack</h2>
+                <span class="threat-level threat-high">High Severity</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                <div>
+                    <h3 style="margin-top: 0;">Threat Information</h3>
+                    <table>
+                        <tr>
+                            <td><strong>Threat ID</strong></td>
+                            <td>TH-2023-11-15-001</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Detection Time</strong></td>
+                            <td>2023-11-15 14:32:45 UTC</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Source IP</strong></td>
+                            <td>192.168.1.45</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Destination IP</strong></td>
+                            <td>192.168.1.100</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confidence</strong></td>
+                            <td>98.7%</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div>
+                    <h3 style="margin-top: 0;">Threat Indicators</h3>
+                    <div class="chart-container" id="threatFeaturesChart"></div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h3>Threat Timeline</h3>
+                <div class="chart-container" id="threatTimelineChart"></div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h3>Recommended Actions</h3>
+                <ul style="line-height: 1.6;">
+                    <li>Block source IP address in firewall</li>
+                    <li>Inspect destination server for compromise</li>
+                    <li>Review network traffic patterns for similar attacks</li>
+                    <li>Update DDoS protection rules</li>
+                </ul>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button class="btn">Block Source</button>
+                    <button class="btn btn-secondary">Create Ticket</button>
+                    <button class="btn btn-secondary">Mark as Resolved</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <a href="/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2023 Advanced Threat Analysis System
+    </div>
+
+    <script>
+        // Threat features chart
+        const featuresData = {
+            x: ['Packet Rate', 'Flow Duration', 'Payload Size', 'Source Port', 'Protocol'],
+            y: [95, 87, 72, 65, 58],
+            type: 'bar',
+            marker: {
+                color: '#1a237e'
+            }
+        };
+        Plotly.newPlot('threatFeaturesChart', [featuresData], {
+            margin: {t: 0, l: 40},
+            yaxis: {title: 'Anomaly Score'}
+        });
+
+        // Threat timeline chart
+        const timelineData = {
+            x: ['14:30', '14:31', '14:32', '14:33', '14:34', '14:35'],
+            y: [120, 450, 980, 1500, 3200, 2800],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Packets/sec'
+        };
+        Plotly.newPlot('threatTimelineChart', [timelineData], {
+            margin: {t: 0},
+            yaxis: {title: 'Packets per Second'}
+        });
+    </script>
+</body>
+</html>
