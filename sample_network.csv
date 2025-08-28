@@ -1,0 +1,5 @@
+Total Fwd Packets,Total Bwd Packets,Fwd PSH Flags,Bwd PSH Flags,Label
+200,100,5,2,BENIGN
+150,120,3,3,DoS
+300,80,10,0,BENIGN
+250,150,6,1,DoS

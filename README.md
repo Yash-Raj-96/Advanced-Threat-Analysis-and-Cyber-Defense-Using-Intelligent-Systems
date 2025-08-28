@@ -1,131 +1,100 @@
-# 🔒 Advanced Threat Analysis and Cyber Defense Using Intelligent Systems
-
-This repository contains the implementation of a **unified cyber defense framework** that integrates **intrusion detection, malware analysis, and vulnerability assessment** into a single system using **multi-modal deep learning** and **explainable AI (XAI)**.
-
----
-
-## 🚀 Features
-- **Unified Threat Detection**
-  - Intrusion Detection (CIC-IDS2017)
-  - Malware Analysis (EMBER)
-  - Vulnerability Assessment (NVD CVEs)
-- **Multi-Modal Deep Learning**
-  - LSTM for network intrusion data
-  - CNN for malware binaries
-  - Transformer for vulnerability text reports
-- **Explainability**
-  - SHAP & LIME-based interpretations for security analysts
-- **End-to-End Pipeline**
-  - Data loading, preprocessing, training, evaluation, and threat analysis
-- **System Monitoring**
-  - MLflow for experiment tracking
-  - Performance monitoring & logging
-- **Interactive Dashboard**
-  - Streamlit-based frontend for real-time visualization
-  - FastAPI backend for threat predictions
-
----
-
-## 📂 Project Structure
-```bash
-/cyber_defense_system
+/cyber-defense-system
 │
-├── backend/
-│   ├── data_processing/       # Data loading & preprocessing
-│   ├── models/                # CNN, LSTM, Transformer & trainer
-│   ├── threat_analysis/       # IDS, malware, vulnerability modules
-│   ├── utils/                 # Logging, validation, interpretability
-│   ├── api/                   # FastAPI routes
-│   ├── config.py              # Configurations
-│   └── main.py                # AdvancedThreatAnalyzer (main pipeline)
+├── /backend
+│   ├── data_processing/
+│   │   └──data_loader.py
+│   ├── models/
+│   │   └──multi_modal_model.py
+│   ├── threat_analysis/
+│   │   └──pipeline.py
+│   │   └──visuals.py
+│   ├── utils/
+│   │   └──__init__.py 
+│   │   └──interpretability.py
+│   ├── config.py
+│   ├── main.py
 │
-├── frontend/
-│   ├── static/                # CSS/JS files
-│   ├── templates/             # HTML templates
-│   └── app.py                 # Streamlit dashboard
+├── /frontend
+│   ├── static/
+│   ├── templates/
+│   │   └──index.html
+│   ├── app.py
 │
-├── tests/                     # Unit & integration tests
-├── docs/                      # Architecture & API specs
-├── data/                      # Raw & processed datasets
-├── requirements.txt           # Dependencies
-└── README.md
-````
+├── requirements.txt
+├── README.md
+├── data/
+│   └── network_logs/
+├       └── CIC-IDS2017
+│           ├── Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
+│           ├── nvdcve-2.0-2025.json
+│           ├── train_ember_2018_v2_features.parquet
+│           ├── train_ember_2018_v2_features.parquet
 
----
 
-## ⚡ Installation & Setup
+***********************************************************************************************************************************************
 
-1. **Clone the repository**
 
-   ```bash
-   git clone https://github.com/<your-username>/cyber-defense-system.git
-   cd cyber-defense-system
-   ```
-
-2. **Create a virtual environment & install dependencies**
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Run the backend (FastAPI)**
-
-   ```bash
-   uvicorn backend.main:app --reload
-   ```
-
-5. **Run the frontend (Streamlit dashboard)**
-
-   ```bash
-   streamlit run frontend/app.py
-   ```
-
----
-
-## 📊 Usage
-
-* **Training & Threat Analysis**
-
-  ```bash
-  python backend/main.py
-  ```
-
-* **Interactive Dashboard**
-  Access at: [http://localhost:8501](http://localhost:8501)
-
-* **FastAPI Endpoints**
-  Access API docs at: [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## 📖 Publication
-
-This project is submitted to:
-**9th International Conference on Computational System and Information Technology for Sustainable Solutions (CSITSS-2025), RV College of Engineering, Bengaluru.**
-
----
-
-## 👨‍💻 Author
-
-**Yashvanth P S**
-M.Tech Project – *Advanced Threat Analysis and Cyber Defense Using Intelligent Systems*
-
----
-
-## ⭐ Acknowledgements
-
-* CIC-IDS2017 Dataset
-* EMBER Malware Dataset
-* NVD CVE Database
-* PyTorch, FastAPI, Streamlit, MLflow
-
----
-
+/cyber_defense_system-1-copy
+│
+├── /backend
+│   ├── /data_processing
+│   │   ├── data_loader.py
+│   │   ├── preprocessor.py
+│   │   └── feature_extractor.py
+│   │   └── prepare_cic.py
+│   │   └── prepare_ember.py
+│   │   └── prepare_nvd.py
+│   ├── /models
+│   │   ├── multi_modal_model.py
+│   │   ├── cnn_module.py
+│   │   ├── lstm_module.py
+│   │   ├── transformer_module.py
+│   │   └── model_trainer.py
+│   │   └── joint_module.py
+│   │   └── transformer_module.py
+│   ├── /threat_analysis
+│   │   ├── pipeline.py
+│   │   ├── intrusion_detector.py
+│   │   ├── malware_analyzer.py
+│   │   └── vulnerability_assessor.py
+│   │   └── validation.py
+│   │   └── visuals.py
+│   ├── /utils
+│   │   ├── interpretability.py
+│   │   ├── logger.py
+│   │   └── config_manager.py
+│   │   └── data_validator.py
+│   │   └── interpretability.py
+│   │   └── performance_monitor.py
+│   ├── /api
+│   │   └── fastapi_app.py
+│   ├── config.py
+│   └── app_core.py 
+│   └── main.py
+│
+├── /frontend
+│   ├── static/
+│   ├── templates/
+│   │   ├── index.html
+│   │   ├── dashboard.html
+│   │   └── threat_details.html
+│   └── app.py
+│
+├── /tests
+│   ├── test_data_processing.py
+│   ├── test_models.py
+│   └── test_threat_analysis.py
+│
+├── /docs
+│   ├── architecture.md
+│   └── api_spec.md
+│
+├── requirements.txt
+├── README.md
+├── .env.example
+└── /data
+    ├── /raw
+    │  └── cve
+    │  └── malware
+    │  └── network_logs
+    └── /processed
