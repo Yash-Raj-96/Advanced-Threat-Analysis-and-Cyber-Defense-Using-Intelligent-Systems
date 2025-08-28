@@ -1,4 +1,3 @@
-````markdown
 # 🔒 Advanced Threat Analysis and Cyber Defense Using Intelligent Systems
 
 This repository contains the implementation of a **unified cyber defense framework** that integrates **intrusion detection, malware analysis, and vulnerability assessment** into a single system using **multi-modal deep learning** and **explainable AI (XAI)**.
